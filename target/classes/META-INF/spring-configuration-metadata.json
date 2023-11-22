@@ -1,0 +1,22 @@
+{
+  "groups": [
+    {
+      "name": "contract-service",
+      "type": "com.os.services.contract.config.ContractServiceConfig",
+      "sourceType": "com.os.services.contract.config.ContractServiceConfig"
+    }
+  ],
+  "properties": [
+    {
+      "name": "contract-service.root-credential",
+      "type": "java.lang.String",
+      "sourceType": "com.os.services.contract.config.ContractServiceConfig"
+    },
+    {
+      "name": "contract-service.server-i-p",
+      "type": "java.lang.String",
+      "sourceType": "com.os.services.contract.config.ContractServiceConfig"
+    }
+  ],
+  "hints": []
+}

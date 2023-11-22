@@ -1,0 +1,29 @@
+server:
+  port: 9084
+
+spring:
+  application:
+    name: contractservice
+    index: ${server.port}
+  cloud:
+    config:
+      uri: http://localhost:7281/config
+      username: root
+      password: optimal
+    
+management:
+  context-path: /manage
+
+info:
+  version: '1.0.3 [0]'
+  app.name: '${spring.application.name}'
+  app.description: 'Contract management service'
+  app.port: ${server.port}
+  app.java-version: '${java.version}'
+  build.artifact: 'contractservice'
+  build.name: 'SERVICES :: Contract'
+  build.version: '1.0.3'
+  build.fix: '0'
+  build.date: '2023-11-22T09:14:17+0000'
+  build.java-version: '17.0.8.1'
+  build.spring-boot: '@spring-boot.version@'
