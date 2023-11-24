@@ -35,6 +35,7 @@ public class SchedulerController {
     private static final String CONTRACT_TYPE_ONETIME = "ONE_TIME";
     private static final String PROCESS_MODEL_NAME = "Renewal_Process";
     private static final String CONTRACT_STATUS_FIN = "Finished";
+    private static final String PROCESSING_STATUS_PROS = "processing";
     private static final Logger log = LoggerFactory.getLogger(SchedulerController.class);
 
     // This task works every configured time and after service restarts
@@ -44,9 +45,11 @@ public class SchedulerController {
     public void schedulerTask() {
 
         try {
+
             reminderTask();
             updateTask();
             updateTaskForOneTime();
+            updateStatus();
         } catch (Exception e) {
             log.error(e.getMessage());
         }
@@ -203,6 +206,63 @@ public class SchedulerController {
         }
     }
 
+    // Status Update Task INI
+    public void updateStatus() throws Exception {
+
+        try {
+            // Create filter
+            FilterByIndexData filter = new FilterByIndexData();
+            filter.setContractStatus(CONTRACT_STATUS_INA);
+            filter.setProcessingStatus(PROCESSING_STATUS_PROS);
+
+            log.info("typo contract status -->", CONTRACT_STATUS_ACT, " Process status--->", PROCESSING_STATUS_PROS);
+            // Get target object with filter
+            List<DmsObject> dmsObject = resultService.getJsonQueryResult(filter, OBJECT_TYPE);
+            log.info("updateStatus: Result search was completed. The number of hit list is {}", dmsObject.size(),
+                    "status: ", CONTRACT_STATUS_INA);
+
+            // Calculate difference days in each object
+            dmsObject.forEach((item) -> {
+
+                String contractEndDate = item.getData().getContractEnddate();
+                int notificationPeriod = item.getData().getNotificationPeriod();
+
+                int dayDiff;
+                try {
+                    dayDiff = calculateDayDiff(contractEndDate);
+                    if (dayDiff > notificationPeriod) {
+                        // WR
+                        dmsService.updateItem(item.getId(), CONTRACT_STATUS_ACT,
+                                PROCESSING_STATUS_FIN);
+                        log.info("updateStatus: This contract should be notified to user because {} < {}", dayDiff,
+                                notificationPeriod);
+
+                        // Get process model id of contract management
+                        String modelId = getModelIdForContractMng();
+                        log.info("updateStatus:  Process model id = {}", modelId);
+                    } else if (dayDiff > 0) {
+                        dmsService.updateItem(item.getId(), CONTRACT_STATUS_ACT,
+                                PROCESSING_STATUS_FIN);
+                        // WT
+                        log.info("updateStatus: This contract not active {} < {}", dayDiff,
+                                notificationPeriod);
+                    } else {
+                        // No action
+                        log.info("updateStatus: This contract not active {} < {}", dayDiff,
+                                notificationPeriod);
+                    }
+                } catch (Exception e) {
+                    log.error(e.getMessage());
+                }
+
+            });
+        } catch (Exception e) {
+            log.error("updateStatus: Error message =  {}", e.getMessage());
+            throw new Exception(e.getMessage());
+        }
+    }
+
+    // Status Update Task INI
     //
     private String getModelIdForContractMng() throws Exception {
 
