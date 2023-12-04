@@ -5,7 +5,7 @@
 
 	<groupId>org.contract</groupId>
 	<artifactId>contractservice</artifactId>
-	<version>1.0.3</version>
+	<version>1.0.4</version>
 	<packaging>jar</packaging>
 
 	<name>SERVICES :: Contract</name>
@@ -14,7 +14,7 @@
 	<parent>
 		<groupId>org.springframework.boot</groupId>
 		<artifactId>spring-boot-starter-parent</artifactId>
-		<version>2.1.3.RELEASE</version>
+		<version>2.7.13</version>
 		<relativePath /> <!-- lookup parent from repository -->
 	</parent>
 
@@ -23,13 +23,17 @@
 		<fix>0</fix>
 
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-		<java.version>1.8</java.version>
+		<java.version>17</java.version>
+		<maven.compiler.target>17</maven.compiler.target>
+		<maven.compiler.source>17</maven.compiler.source>
 
 		<maven.build.timestamp.format>yyyy-MM-dd'T'HH:mm:ssZZ</maven.build.timestamp.format>
 		<buildNumber>${maven.build.timestamp}</buildNumber>
 
 		<swagger2.version>2.5.0</swagger2.version>
 		<maven.test.skip>true</maven.test.skip>
+        <org.springframework-version>2.7.13</org.springframework-version>
+		<spring-cloud.version>2021.0.8</spring-cloud.version>
 	</properties>
 
 	<dependencies>
@@ -65,6 +69,10 @@
 			<groupId>org.springframework.cloud</groupId>
 			<artifactId>spring-cloud-starter-openfeign</artifactId>
 		</dependency>
+		<dependency>
+			<groupId>org.springframework.cloud</groupId>
+			<artifactId>spring-cloud-starter-bootstrap</artifactId>
+		</dependency>
 
 		<dependency>
 			<groupId>org.jolokia</groupId>
@@ -75,8 +83,13 @@
 			<artifactId>lombok</artifactId>
 			<scope>provided</scope>
 		</dependency>
-
+		<!-- Swagger -->
 		<dependency>
+			<groupId>org.springdoc</groupId>
+			<artifactId>springdoc-openapi-ui</artifactId>
+			<version>1.6.6</version>
+		</dependency>
+		<!-- <dependency>
 			<groupId>io.springfox</groupId>
 			<artifactId>springfox-swagger2</artifactId>
 			<version>${swagger2.version}</version>
@@ -85,8 +98,7 @@
 			<groupId>io.springfox</groupId>
 			<artifactId>springfox-swagger-ui</artifactId>
 			<version>${swagger2.version}</version>
-		</dependency>
-
+		</dependency> -->
 
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
@@ -116,25 +128,39 @@
 			<groupId>org.apache.activemq</groupId>
 			<artifactId>activemq-camel</artifactId>
 		</dependency>
-
+		<!-- <dependency>
+		    <groupId>org.springframework</groupId>
+            <artifactId>spring-core</artifactId>
+			<version>6.1.1</version>
+		</dependency>
+		<dependency>
+		    <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-autoconfigure</artifactId>
+			<version>3.2.0</version>
+		</dependency>		 -->
 
 		<!-- feign multipart support -->
 		
 		<dependency>
 			<groupId>io.github.openfeign.form</groupId>
 			<artifactId>feign-form</artifactId>
-			<version>2.2.0</version>
+			<version>3.8.0</version>
 		</dependency>
 		<dependency>
 			<groupId>io.github.openfeign.form</groupId>
 			<artifactId>feign-form-spring</artifactId>
-			<version>2.2.0</version>
+			<version>3.8.0</version>
 		</dependency>
 		<dependency>
+			<groupId>io.github.openfeign</groupId>
+			<artifactId>feign-jackson</artifactId>
+			<version>12.5</version>
+		</dependency>
+		<!-- <dependency>
 			<groupId>com.netflix.feign</groupId>
 			<artifactId>feign-jackson</artifactId>
-			<version>8.18.0</version>
-		</dependency>
+			<version>12.</version>
+		</dependency> -->
         <dependency>
             <groupId>com.google.code.gson</groupId>
             <artifactId>gson</artifactId>
@@ -155,7 +181,7 @@
 			<dependency>
 				<groupId>org.springframework.cloud</groupId>
 				<artifactId>spring-cloud-starter-parent</artifactId>
-				<version>Greenwich.RELEASE</version>
+				<version>${spring-cloud.version}</version>
 				<type>pom</type>
 				<scope>import</scope>
 			</dependency>
