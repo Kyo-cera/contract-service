@@ -15,6 +15,7 @@ import org.springframework.stereotype.Component;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
+import java.util.Map;
 
 @Component
 public class SchedulerController {
@@ -28,6 +29,7 @@ public class SchedulerController {
 
     private static final SimpleDateFormat DATE_FORMAT = new SimpleDateFormat("yyyy-MM-dd");
     private static final String OBJECT_TYPE = "absContractDoc";
+    private static final String OBJECT_TYPE_SIGNATURE = "yuvsigning";
     private static final String CONTRACT_STATUS_ACT = "Active";
     private static final String CONTRACT_STATUS_INA = "Inactive";
     private static final String PROCESSING_STATUS_FIN = "finalized";
@@ -36,11 +38,11 @@ public class SchedulerController {
     private static final String PROCESS_MODEL_NAME = "Renewal_Process";
     private static final String CONTRACT_STATUS_FIN = "Finished";
     private static final String PROCESSING_STATUS_PROS = "processing";
+    private static final String SIGNATURE_STATUS_SIGNED = "signed";
     private static final Logger log = LoggerFactory.getLogger(SchedulerController.class);
 
-    // This task works every configured time and after service restarts
-    // @Scheduled(initialDelay = 1000, fixedRate = 5000) for demo
-    @Scheduled(cron = "${schedulerCron}")
+    @Scheduled(initialDelay = 1000, fixedRate = 1800000)
+    // @Scheduled(cron = "${schedulerCron}")
     @EventListener(ApplicationReadyEvent.class)
     public void schedulerTask() {
 
@@ -214,6 +216,7 @@ public class SchedulerController {
             FilterByIndexData filter = new FilterByIndexData();
             filter.setContractStatus(CONTRACT_STATUS_INA);
             filter.setProcessingStatus(PROCESSING_STATUS_PROS);
+            // filter.setYuvsigStatus(SIGNATURE_STATUS_SIGNED);
 
             log.info("typo contract status -->", CONTRACT_STATUS_ACT, " Process status--->", PROCESSING_STATUS_PROS);
             // Get target object with filter
@@ -226,39 +229,66 @@ public class SchedulerController {
 
                 String contractEndDate = item.getData().getContractEnddate();
                 int notificationPeriod = item.getData().getNotificationPeriod();
+                // ItemId
+                String itemId = item.getId();
+                // Get object data with itemId
 
-                int dayDiff;
-                try {
-                    dayDiff = calculateDayDiff(contractEndDate);
-                    if (dayDiff > notificationPeriod) {
-                        // WR
-                        dmsService.updateItem(item.getId(), CONTRACT_STATUS_ACT,
-                                PROCESSING_STATUS_FIN);
-                        log.info("updateStatus: This contract should be notified to user because {} < {}", dayDiff,
-                                notificationPeriod);
+                Map<String, Object> itemData = dmsService.getItem(itemId);
+                boolean isSigned = findSigned(itemData.toString());
+                log.info("Is signed: " + isSigned);
 
-                        // Get process model id of contract management
-                        String modelId = getModelIdForContractMng();
-                        log.info("updateStatus:  Process model id = {}", modelId);
-                    } else if (dayDiff > 0) {
-                        dmsService.updateItem(item.getId(), CONTRACT_STATUS_ACT,
-                                PROCESSING_STATUS_FIN);
-                        // WT
-                        log.info("updateStatus: This contract not active {} < {}", dayDiff,
-                                notificationPeriod);
-                    } else {
-                        // No action
-                        log.info("updateStatus: This contract not active {} < {}", dayDiff,
-                                notificationPeriod);
+                if (isSigned) {
+
+                    int dayDiff;
+                    try {
+                        dayDiff = calculateDayDiff(contractEndDate);
+                        if (dayDiff > notificationPeriod) {
+                            // WR
+                            dmsService.updateItem(item.getId(), CONTRACT_STATUS_ACT,
+                                    PROCESSING_STATUS_FIN);
+                            log.info("updateStatus: This contract should be notified to user because {} < {}", dayDiff,
+                                    notificationPeriod);
+
+                            // Get process model id of contract management
+                            String modelId = getModelIdForContractMng();
+                            log.info("updateStatus:  Process model id = {}", modelId);
+                        } else if (dayDiff > 0) {
+                            dmsService.updateItem(item.getId(), CONTRACT_STATUS_ACT,
+                                    PROCESSING_STATUS_FIN);
+                            // WT
+                            log.info("updateStatus: This contract not active {} < {}", dayDiff,
+                                    notificationPeriod);
+                        } else {
+                            // No action
+                            log.info("updateStatus: This contract not active {} < {}", dayDiff,
+                                    notificationPeriod);
+                        }
+                    } catch (Exception e) {
+                        log.error(e.getMessage());
                     }
-                } catch (Exception e) {
-                    log.error(e.getMessage());
+
                 }
 
             });
         } catch (Exception e) {
             log.error("updateStatus: Error message =  {}", e.getMessage());
             throw new Exception(e.getMessage());
+        }
+    }
+
+    // find Signed:
+    public boolean findSigned(String itemData) {
+        try {
+            // log.info("Item : " + itemData);
+            if (itemData.contains(SIGNATURE_STATUS_SIGNED)) {
+                return true;
+            } else {
+                return false;
+            }
+        } catch (Exception e) {
+
+            e.printStackTrace();
+            return false;
         }
     }
 

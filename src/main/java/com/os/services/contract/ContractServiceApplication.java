@@ -11,6 +11,7 @@ import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
 import org.springframework.jms.annotation.EnableJms;
 import org.springframework.scheduling.annotation.EnableScheduling;
+//import org.springframework.beans.factory.aot.BeanRegistrationExcludeFilter;
 
 import java.io.IOException;
 import java.text.ParseException;

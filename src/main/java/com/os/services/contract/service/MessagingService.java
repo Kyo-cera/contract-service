@@ -86,7 +86,7 @@ public class MessagingService {
         String itemid = (String) messageBody.get("itemid");
 
         Map<String, Object> itemData = dmsService.getItem(itemid);
-
+        LOGGER.info("yuvsigstatus : " + itemData.get("yuvsigstatus"));
         LOGGER.info("Item : " + itemData.toString());
 
     }

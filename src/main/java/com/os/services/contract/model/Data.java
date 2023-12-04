@@ -48,5 +48,8 @@ public class Data {
     @SerializedName("partnername")
     @Expose
     private String partnerName;
+    @SerializedName("yuvsigstatus")
+    @Expose
+    private String yuvsigStatus;
 
 }

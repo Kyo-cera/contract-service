@@ -14,6 +14,9 @@ public class FilterByIndexData {
     @SerializedName("processingstatus")
     @Expose
     private String processingStatus;
+    @SerializedName("yuvsigstatus")
+    @Expose
+    private String yuvsigStatus;
     @SerializedName("contracttype")
     @Expose
     private String contractType;
