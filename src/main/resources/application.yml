@@ -1,4 +1,27 @@
 #default values for single instantiation 
+spring:
+  application:
+    name: contractservice
+  cloud:
+    compatibility-verifier:
+      enabled: false
+    config:
+      enabled: false
+  # Configurazione JMS Artemis Embedded
+  artemis:
+    mode: embedded
+    embedded:
+      enabled: true
+      persistent: false
+      data-directory: target/artemis-data
+      queues: documentDeleted,contractProcessed
+    broker-url: vm://localhost?broker.persistent=false
+    user: admin
+    password: admin
+  # Disabilita JMS se non necessario
+  jms:
+    enabled: true
+
 eureka:
   instance:
     status-page-url-path: /manage/info
@@ -14,7 +37,7 @@ management:
     web:
       base-path: /manage
       exposure:
-        include: metrics,info,health
+        include: metrics,info,health,jms
   endpoint:
     health:
       show-details: always
@@ -24,9 +47,34 @@ contract-service:
   rootCredential: root:optimal
   serverIP: 192.168.31.24
 
+## DMS Service configuration
+dms:
+  service:
+    url: http://192.168.31.24:7301
+    trust-pattern: "192.168.31.*"
+  security:
+    trust:
+      ip:
+        pattern: 192.168.31.*
+
+## Feign configuration
+feign:
+  client:
+    config:
+      dms:
+        # Usa il service discovery invece dell'URL hardcoded
+        # url: # rimuovi questa linea per usare Eureka
+
 ## Scheduler
 ## sec(0-59) min(0-59) hour(0-23) day(1-31) month(1-12) day of the week(0:Sun,1:Mon,2:Tue,3:Wed,4:Thu,5:Fri,6:Sat,7:Sun)
 ## schedulerCron: 0 0 8 * * *
 schedulerCron: 0 30 * * * *
 
 hystrix.command.default.execution.isolation.thread.timeoutInMilliseconds: 10000
+
+# Logging per debug JMS
+logging:
+  level:
+    org.springframework.jms: WARN
+    org.apache.activemq: WARN
+    com.os.services.contract: DEBUG
