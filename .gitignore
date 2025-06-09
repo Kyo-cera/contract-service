@@ -10,6 +10,10 @@ target/
 *.iml
 *.ipr
 .vscode/
+.factorypath
+.project
+.classpath
+.settings/
 
 # OS
 .DS_Store
