@@ -61,9 +61,15 @@ dms:
 feign:
   client:
     config:
+      default:
+        connect-timeout: 60000
+        read-timeout: 60000
       dms:
-        # Usa il service discovery invece dell'URL hardcoded
-        # url: # rimuovi questa linea per usare Eureka
+        url: http://192.168.31.24:7301  # URL diretto invece di 'dms'
+      bmp:
+        connect-timeout: 30000
+        read-timeout: 60000
+        logger-level: full
 
 ## Scheduler
 ## sec(0-59) min(0-59) hour(0-23) day(1-31) month(1-12) day of the week(0:Sun,1:Mon,2:Tue,3:Wed,4:Thu,5:Fri,6:Sat,7:Sun)
@@ -72,9 +78,28 @@ schedulerCron: 0 30 * * * *
 
 hystrix.command.default.execution.isolation.thread.timeoutInMilliseconds: 10000
 
-# Logging per debug JMS
+# Logging per debug dettagliato
 logging:
   level:
     org.springframework.jms: WARN
     org.apache.activemq: WARN
     com.os.services.contract: DEBUG
+    com.os.services.contract.dao.ApiClient: TRACE
+    org.springframework.web.client: DEBUG
+    org.apache.http: DEBUG
+    feign: DEBUG
+    # Per vedere le richieste HTTP complete
+    org.springframework.web.client.RestTemplate: DEBUG
+
+# Configurazione degli endpoint
+endpoints:
+  dms:
+    base-url: http://192.168.31.24:7301
+  bpm:
+    base-url: http://localhost:8080/bpm-service
+    timeout:
+      connect: 30000
+      read: 60000
+
+# O se usi application.properties:
+# endpoints.bpm.base-url=http://localhost:8080/bpm
